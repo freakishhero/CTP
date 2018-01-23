@@ -16,9 +16,13 @@ public class AI : MonoBehaviour {
     [SerializeField]
     List<GameObject> ownedTiles;
 
+    [SerializeField]
+    List<int> tileWeightings;
+
     // Use this for initialization
     void Start () {
         ownedTiles = new List<GameObject>();
+        tileWeightings = new List<int>();
     }
 	
 	// Update is called once per frame
@@ -52,8 +56,8 @@ public class AI : MonoBehaviour {
         StartTurn();
         if(OccupyTile())
         {
-            NextTurn();
         }
+        EndTurn();
     }
 
     List<GameObject> getOwnedTiles()
@@ -71,37 +75,49 @@ public class AI : MonoBehaviour {
 
     int calculateScore()
     {
-        int total = 0;
-        foreach(GameObject tile in getOwnedTiles())
-        {
-            total++;
-        }
-        return total;
+        return getOwnedTiles().Count;
     }
 
     GameObject SelectTile()
     {
         GameObject chosenTile = null;
+        tileWeightings.Clear();
+        int tileWeighting = 0;
 
         foreach (GameObject tile in getOwnedTiles())
         {
-            if(chosenTile == null)
+            if (tile.GetComponent<TileData>().StackSize > 1)
             {
-                chosenTile = tile;
+                tileWeighting += tile.GetComponent<TileData>().StackSize;
+
+                if (tile.GetComponent<TileData>().getSurroundingEmptyTiles() >= 1)
+                {
+                    tileWeighting += tile.GetComponent<TileData>().getSurroundingEmptyTiles();
+                }
             }
-            else if (tile.GetComponent<TileData>().StackSize > chosenTile.GetComponent<TileData>().StackSize)
+
+            tileWeightings.Add(tileWeighting);
+        }
+
+        tileWeighting = 0;
+        int chosenTileIndex = 0;
+
+        for (int i = 0; i < tileWeightings.Count; i++)
+        {
+            
+            if(tileWeightings[i] > tileWeighting)
             {
-                chosenTile = tile;
+                tileWeighting = tileWeightings[i];
+                chosenTileIndex = i;
             }
         }
 
-        if (chosenTile != null)
+        chosenTile = ownedTiles[chosenTileIndex];
+
+        if (chosenTile == null)
         {
-            Debug.Log("Player " + playerID + " has chosen to move the stack at TileID(" + chosenTile.GetComponent<TileData>().ID + ")");
-        }
-        else
-        {
-            Debug.Log("There are no tiles to select for player " + playerID);
+            Debug.Log("Player " + playerID + " has no ideal tiles to move.");
+            return null;
         }
         return chosenTile;
     }
@@ -110,8 +126,12 @@ public class AI : MonoBehaviour {
     {
         GameObject selectedTile = SelectTile();
         GameObject occupiedTile = null;
-        float minDistance = 100000;
+        float minDistance = 1000000;
 
+        if (selectedTile == null)
+        {
+            return false;
+        }
         foreach (GameObject tile in Game.getBoard())
         {
             if (tile.tag == "Tile")
@@ -123,20 +143,27 @@ public class AI : MonoBehaviour {
                 }
             }
         }
-        if (occupiedTile != null && selectedTile.GetComponent<TileData>().StackSize > 1)
+
+        if(occupiedTile == null)
         {
-            selectedTile.GetComponent<TileData>().StackSize /= 2;
+            Debug.Log("There are no tiles to occupy.");
+            return false;
+        }
+
+        if (selectedTile.GetComponent<TileData>().StackSize > 1)
+        {
+            int tokenQuantity = Random.Range(1, selectedTile.GetComponent<TileData>().StackSize - 1);
+            selectedTile.GetComponent<TileData>().StackSize -= tokenQuantity;
             Game.getBoard()[occupiedTile.GetComponent<TileData>().ID].GetComponent<TileData>().Owner = playerID;
-            Game.getBoard()[occupiedTile.GetComponent<TileData>().ID].GetComponent<TileData>().StackSize = selectedTile.GetComponent<TileData>().StackSize;
-            Debug.Log("Player " + playerID + " has chosen to move the selected stack to TileID(" + occupiedTile.GetComponent<TileData>().ID + ")");
+            Game.getBoard()[occupiedTile.GetComponent<TileData>().ID].GetComponent<TileData>().StackSize = tokenQuantity;
+            Debug.Log("Player " + playerID + " has chosen to move " + tokenQuantity + " tokens to tile TileID(" + selectedTile.GetComponent<TileData>().ID + ") to empty tile TileID(" + occupiedTile.GetComponent<TileData>().ID + ")");
             return true;
         }
         else
         {
-            Debug.Log("Player " + playerID + " has no tiles with a stacksize greater than one.");
+            Debug.Log("Player " + playerID + " has selected a tile with a stacksize that isn't greater than one.");
+            return false;
         }
-        Debug.Log("There are no tiles to occupy");
-        return false;
     }
 
     void StartTurn()
@@ -144,7 +171,8 @@ public class AI : MonoBehaviour {
         score = calculateScore();
         takenTurn = true;
     }
-    void NextTurn()
+    void EndTurn()
     {
+        Debug.Log("Player " + playerID + " ends their turn.");
     }
 }

@@ -18,7 +18,7 @@ public class TileData : MonoBehaviour {
     bool blank = false;
 
     [SerializeField]
-    Sprite[] tileSprites;
+    Sprite[] tileSprites;    
 
     private GameObject checker;
 
@@ -91,6 +91,22 @@ public class TileData : MonoBehaviour {
         {
             blank = value;
         }
+    }
+
+    public int getSurroundingEmptyTiles()
+    {
+        Collider[] tiles = Physics.OverlapSphere(this.transform.position, 2.5f);
+
+        int emptyTiles = 0;
+
+        for (int i = 0; i < tiles.Length; i++)
+        {
+            if (tiles[i].gameObject.tag == "Tile")
+            {
+                emptyTiles++;
+            }
+        }
+        return emptyTiles;
     }
 
     public void setOwnership(byte playerID)
