@@ -14,7 +14,7 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetKeyDown("space"))
         {
-            EndTurn();
+            GameData.EndTurn();
         }
 
         if (Input.GetKeyDown(KeyCode.LeftShift))
@@ -24,27 +24,11 @@ public class PlayerController : MonoBehaviour
 
         if (GameData.PlayersTurn == 1)
         {
-            if (Input.GetButtonDown("Fire1"))
+            if (Input.GetButtonDown("Mouse1"))
             {
                 SelectTile();
             }
         }
-    }
-
-    void EndTurn()
-    {
-        if (GameData.PlayersTurn < 4)
-        {
-            if (GameData.PlayersTurn > 0 && GameData.PlayersTurn < 4)
-                Game.getCPUs()[GameData.PlayersTurn - 1].GetComponent<AI>().setTurnState(false);
-
-            GameData.PlayersTurn++;
-        }
-        else
-        {
-            GameData.PlayersTurn = 1;
-        }
-        Debug.Log("Player " + GameData.PlayersTurn + "'s turn.");
     }
 
     bool SelectTile()
@@ -80,13 +64,13 @@ public class PlayerController : MonoBehaviour
                     if (tile != hit.collider.gameObject)
                     {
                         TileData d = tile.GetComponent<TileData>();
-                        Debug.Log("Tile position: " + tile.transform.position);
-                        Debug.Log("checker position: " + data.TileChecker.transform.position);
+                        //Debug.Log("Tile position: " + tile.transform.position);
+                        //Debug.Log("checker position: " + data.TileChecker.transform.position);
                         if (data.TileChecker.transform.position == tile.transform.position && tile.gameObject.tag == "Tile")
                         {
                             queriedTiles++;
                             lastIDqueried = d.ID;
-                            Debug.Log("On an empty tile. Tile ID is:" + lastIDqueried);
+                            //Debug.Log("On an empty tile. Tile ID is:" + lastIDqueried);
                         }
                         else
                         {
@@ -97,6 +81,7 @@ public class PlayerController : MonoBehaviour
                                 Game.getBoard()[lastIDqueried].GetComponent<TileData>().Owner = 1;
                                 Game.getBoard()[lastIDqueried].GetComponent<TileData>().StackSize = data.StackSize;
                                 Debug.Log("Hit an occupied tile or the end of the game board. Cannot progress. Last unoccupied tile was " + lastIDqueried);
+                                GameData.EndTurn();
                             }
                             else
                             {
@@ -112,7 +97,6 @@ public class PlayerController : MonoBehaviour
             queriedTiles = 0;
             data.TileChecker.transform.position = hit.collider.transform.position;
             lastIDqueried = 0;
-
             return true;
         }
         return false;

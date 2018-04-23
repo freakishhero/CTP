@@ -34,4 +34,20 @@ public class GameData : MonoBehaviour {
             playerCount = value;
         }
     }
+
+    public static void EndTurn()
+    {
+        if (PlayersTurn < 4)
+        {
+            if (PlayersTurn > 0 && PlayersTurn < 4)
+                Game.getCPUs()[GameData.PlayersTurn - 1].GetComponent<AI>().setTurnState(false);
+
+            PlayersTurn++;
+        }
+        else
+        {
+            PlayersTurn = 1;
+        }
+        Debug.Log("Player " + PlayersTurn + "'s turn.");
+    }
 }

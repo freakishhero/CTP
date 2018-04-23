@@ -57,7 +57,7 @@ public class AI : MonoBehaviour {
         if(OccupyTile())
         {
         }
-        EndTurn();
+        GameData.EndTurn();
     }
 
     List<GameObject> getOwnedTiles()
@@ -164,9 +164,5 @@ public class AI : MonoBehaviour {
     {
         calculateScore();
         takenTurn = true;
-    }
-    void EndTurn()
-    {
-        Debug.Log("Player " + playerID + " ends their turn.");
     }
 }
