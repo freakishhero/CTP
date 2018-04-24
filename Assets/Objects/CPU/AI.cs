@@ -63,7 +63,7 @@ public class AI : MonoBehaviour {
     List<GameObject> getOwnedTiles()
     {
         ownedTiles.Clear();
-        foreach (GameObject tile in Game.getBoard())
+        foreach (GameObject tile in Game.GetBoard())
         {
             if (tile.gameObject.tag == "Sheep" + playerID)
             {
@@ -90,9 +90,9 @@ public class AI : MonoBehaviour {
             {
                 tileWeighting += tile.GetComponent<TileData>().StackSize;
 
-                if (tile.GetComponent<TileData>().getSurroundingEmptyTiles() >= 1)
+                if (tile.GetComponent<TileData>().GetSurroundingEmptyTiles() >= 1)
                 {
-                    tileWeighting += tile.GetComponent<TileData>().getSurroundingEmptyTiles();
+                    tileWeighting += tile.GetComponent<TileData>().GetSurroundingEmptyTiles();
                 }
             }
 
@@ -123,20 +123,22 @@ public class AI : MonoBehaviour {
     {
         GameObject selectedTile = SelectTile();
         GameObject occupiedTile = null;
-        float minDistance = 1000000;
+        float distance = 0;
+        int best_weighting = 0;
 
         if (selectedTile == null)
         {
             return false;
         }
 
-        foreach (GameObject tile in Game.getBoard())
+        foreach (GameObject tile in Game.GetBoard())
         {
             if (tile.tag == "Tile")
             {
-                if(Vector3.Distance(selectedTile.gameObject.transform.position, tile.gameObject.transform.position) < minDistance)
+                if (Vector3.Distance(selectedTile.gameObject.transform.position, tile.gameObject.transform.position) > distance)
                 {
-                    minDistance = Vector3.Distance(selectedTile.gameObject.transform.position, tile.gameObject.transform.position);
+                    distance = Vector3.Distance(selectedTile.gameObject.transform.position, tile.gameObject.transform.position);
+                    best_weighting = (int)distance + tile.GetComponent<TileData>().TileValue;
                     occupiedTile = tile;
                 }
             }
@@ -154,8 +156,10 @@ public class AI : MonoBehaviour {
                 selectedTile.GetComponent<TileData>().ID + "(" + selectedTile.GetComponent<TileData>().StackSize + " tokens) to TileID: " 
                 + occupiedTile.GetComponent<TileData>().ID + ".");
             selectedTile.GetComponent<TileData>().StackSize -= tokenQuantity;
-            Game.getBoard()[occupiedTile.GetComponent<TileData>().ID].GetComponent<TileData>().Owner = playerID;
-            Game.getBoard()[occupiedTile.GetComponent<TileData>().ID].GetComponent<TileData>().StackSize = tokenQuantity;
+            Game.GetBoard()[occupiedTile.GetComponent<TileData>().ID].GetComponent<TileData>().Owner = playerID;
+            Game.GetBoard()[occupiedTile.GetComponent<TileData>().ID].GetComponent<TileData>().StackSize = tokenQuantity;
+            Game.GetBoard()[occupiedTile.GetComponent<TileData>().ID].GetComponent<TileData>().UpdateOwnership();
+            Debug.Log(best_weighting);
             return true;
         }
     }

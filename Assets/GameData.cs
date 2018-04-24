@@ -6,6 +6,8 @@ public class GameData : MonoBehaviour {
 
     static int playersTurn;
     static int playerCount;
+    static int turns;
+
     // Use this for initialization
     void Start()
     { 
@@ -20,6 +22,18 @@ public class GameData : MonoBehaviour {
         set
         {
             playersTurn = value;
+        }
+    }
+
+    public static int Turns
+    {
+        get
+        {
+            return turns;
+        }
+        set
+        {
+            turns = value;
         }
     }
 
@@ -40,7 +54,7 @@ public class GameData : MonoBehaviour {
         if (PlayersTurn < 4)
         {
             if (PlayersTurn > 0 && PlayersTurn < 4)
-                Game.getCPUs()[GameData.PlayersTurn - 1].GetComponent<AI>().setTurnState(false);
+                Game.GetCPUs()[GameData.PlayersTurn - 1].GetComponent<AI>().setTurnState(false);
 
             PlayersTurn++;
         }
@@ -48,6 +62,9 @@ public class GameData : MonoBehaviour {
         {
             PlayersTurn = 1;
         }
-        Debug.Log("Player " + PlayersTurn + "'s turn.");
+        turns++;
+        Debug.Log("Turn " + GameData.Turns + ": player " + GameData.PlayersTurn + "'s turn!");
+        Game.UpdateTileValues();
+        
     }
 }

@@ -26,9 +26,8 @@ public class Game : MonoBehaviour {
     void Start()
     {
         board = new List<GameObject>();
-        createGameBoard();
+        CreateGameBoard();
         GameData.PlayerCount = 4;
-        GameData.PlayersTurn = 1;
 
         AIs = new List<GameObject>();
         for(byte i = 2; i <= GameData.PlayerCount; i++)
@@ -59,7 +58,8 @@ public class Game : MonoBehaviour {
         board[37].GetComponent<TileData>().RemoveTile = true;
         board[17].GetComponent<TileData>().RemoveTile = true;
         board[18].GetComponent<TileData>().RemoveTile = true;
-        
+
+        StartGame();
     }
 
     // Update is called once per frame
@@ -69,17 +69,17 @@ public class Game : MonoBehaviour {
         //PROECSSPLAYER
     }
 
-    void createGameBoard() //More like Game Bored AMIRITE?!?!?
+    void CreateGameBoard() //More like Game Bored AMIRITE?!?!?
     {
         byte iterator = 0; //0 to 256
-        ushort spawn_amount = 225; //0 and 65535
+        ushort spawn_amount = 64; //0 and 65535
         sbyte x_location = 0; //-128 to 127    
         float y_distance = -1.75f;
         byte x_distance = 2;
 
         for (ushort i = 0; i < spawn_amount; i++)
         {
-            GameObject instancedTile = (GameObject)Instantiate(tile, location, Quaternion.identity);
+            GameObject instancedTile = Instantiate(tile, location, Quaternion.identity);
             instancedTile.GetComponent<TileData>().ID = i;
             board.Add(instancedTile);
             location.x += x_distance;
@@ -97,12 +97,27 @@ public class Game : MonoBehaviour {
         }
     }
 
-    public static List<GameObject> getBoard()
+    void StartGame()
+    {
+        UpdateTileValues();
+        GameData.EndTurn();
+    }
+
+    public static void UpdateTileValues()
+    {
+        foreach(GameObject tile in board)
+        {
+            TileData d = tile.GetComponent<TileData>();
+            d.TileValue = d.GetSurroundingEmptyTiles();
+        }
+    }
+
+    public static List<GameObject> GetBoard()
     {
         return board;
     }
 
-    public static List<GameObject> getCPUs()
+    public static List<GameObject> GetCPUs()
     {
         return AIs;
     }

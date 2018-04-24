@@ -1,0 +1,5 @@
+
+Loop
+	check which valid tile is the best to occupy
+	check if it can move to that tile from any point
+	if it can't, remove that tile from the possible tiles and try again.

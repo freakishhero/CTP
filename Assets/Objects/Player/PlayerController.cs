@@ -22,26 +22,29 @@ public class PlayerController : MonoBehaviour
             Debug.Log("It is currently player " + GameData.PlayersTurn + "'s turn.");
         }
 
-        if (GameData.PlayersTurn == 1)
+        if (Input.GetButtonDown("Fire1"))
         {
-            if (Input.GetButtonDown("Mouse1"))
+            if (GameData.PlayersTurn == 1)
             {
                 SelectTile();
+            }
+            else
+            {
+                Debug.Log("It's not your turn!");
             }
         }
     }
 
     bool SelectTile()
     {
-        Vector2 target = new Vector2
+        Vector3 target = new Vector3
             (
             this.gameObject.GetComponent<Camera>().ScreenToWorldPoint(Input.mousePosition).x,
-            this.gameObject.GetComponent<Camera>().ScreenToWorldPoint(Input.mousePosition).y
+            this.gameObject.GetComponent<Camera>().ScreenToWorldPoint(Input.mousePosition).y, 0
             );
 
-        RaycastHit2D hit = Physics2D.Raycast(target, Vector2.zero, 0f);
-        //Debug.DrawLine(transform.position, target);
-        //Debug.Log(target);
+        RaycastHit hit;
+        Physics.Raycast(target, transform.TransformDirection(Vector3.forward), out hit, 100f);
 
         if (hit.collider == null)
             return false;
@@ -51,26 +54,28 @@ public class PlayerController : MonoBehaviour
 
         TileData data = hit.collider.gameObject.GetComponent<TileData>();
 
+        if (data.GetSurroundingEmptyTiles() < 1)
+        {
+            Debug.Log("This tile cannot move");
+            return false;
+        }
+        
         //LOGIC FOR SPLITTING STACK
         if (data.StackSize > 1)
         {
             bool moved = false;
             ushort lastIDqueried = 0;
             int queriedTiles = 0;
-            foreach (GameObject tile in Game.getBoard())
+            foreach (GameObject tile in Game.GetBoard())
             {
                 if (!moved)
                 {
                     if (tile != hit.collider.gameObject)
                     {
-                        TileData d = tile.GetComponent<TileData>();
-                        //Debug.Log("Tile position: " + tile.transform.position);
-                        //Debug.Log("checker position: " + data.TileChecker.transform.position);
                         if (data.TileChecker.transform.position == tile.transform.position && tile.gameObject.tag == "Tile")
                         {
                             queriedTiles++;
-                            lastIDqueried = d.ID;
-                            //Debug.Log("On an empty tile. Tile ID is:" + lastIDqueried);
+                            lastIDqueried = tile.GetComponent<TileData>().ID;
                         }
                         else
                         {
@@ -78,19 +83,17 @@ public class PlayerController : MonoBehaviour
                             if (queriedTiles > 0)
                             {
                                 data.StackSize /= 2;
-                                Game.getBoard()[lastIDqueried].GetComponent<TileData>().Owner = 1;
-                                Game.getBoard()[lastIDqueried].GetComponent<TileData>().StackSize = data.StackSize;
-                                Debug.Log("Hit an occupied tile or the end of the game board. Cannot progress. Last unoccupied tile was " + lastIDqueried);
+                                Game.GetBoard()[lastIDqueried].GetComponent<TileData>().Owner = 1;
+                                Game.GetBoard()[lastIDqueried].GetComponent<TileData>().StackSize = data.StackSize;
                                 GameData.EndTurn();
                             }
                             else
                             {
                                 Debug.Log("This stack cannot move in that direction.");
                             }
-
                         }
                     }
-                    data.TileChecker.transform.position += Vector3.right * 2;
+                    data.TileChecker.transform.position += Directions.east;
                 }
             }
             moved = false;

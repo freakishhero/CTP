@@ -18,13 +18,14 @@ public class TileData : MonoBehaviour {
     bool blank = false;
 
     [SerializeField]
-    Sprite[] tileSprites;    
+    Sprite[] tileSprites;
+
+    [SerializeField]
+    int tile_value;
 
     private GameObject checker;
 
-
     private GameObject stack_text;
-    
 
 	// Use this for initialization
 	void Start () {
@@ -34,7 +35,7 @@ public class TileData : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        updateOwnership();
+        UpdateOwnership();
     }
 
     public int StackSize
@@ -93,30 +94,21 @@ public class TileData : MonoBehaviour {
         }
     }
 
-    public int getSurroundingEmptyTiles()
+    public int TileValue
     {
-        Collider[] tiles = Physics.OverlapSphere(this.transform.position, 2.5f);
-
-        int emptyTiles = 0;
-
-        for (int i = 0; i < tiles.Length; i++)
+        get
         {
-            if (tiles[i].gameObject.tag == "Tile")
-            {
-                emptyTiles++;
-            }
+            return tile_value;
         }
-        return emptyTiles;
+        set
+        {
+            tile_value = value;
+        }
     }
 
-    public void setOwnership(byte playerID)
+    public void UpdateOwnership()
     {
-        playerOwner = playerID;
-        stack_size = 16;
-    }
-    public void updateOwnership()
-    {
-        if(playerOwner > 4)
+        if (playerOwner > 4)
         {
             playerOwner = 0;
             Debug.Log("PLAYER OWNER CAN'T EXCEED 4.");
@@ -131,17 +123,44 @@ public class TileData : MonoBehaviour {
         if (stack_size > 0 && playerOwner > 0)
         {
             gameObject.tag = "Sheep" + playerOwner;
+            gameObject.name = "Tile_Sheep_" + playerOwner;
             stack_text.SetActive(true);
             stack_text.GetComponent<TextMesh>().text = "" + stack_size;
         }
         else if (playerOwner == 0 && blank == false)
         {
             gameObject.tag = "Tile";
-            stack_text.SetActive(false);
-        } else
-        {
-            gameObject.tag = "Untagged";
+            gameObject.name = "Tile";
             stack_text.SetActive(false);
         }
+        else
+        {
+            gameObject.tag = "Empty";
+            gameObject.name = "Blank_Tile";
+            stack_text.SetActive(false);
+        }
+    }
+
+    public int GetSurroundingEmptyTiles()
+    {
+        Collider[] tiles = Physics.OverlapSphere(this.transform.position, 2.0f);
+
+        int emptyTiles = 0;
+
+        for (int i = 0; i < tiles.Length; i++)
+        {
+            TileData td = tiles[i].GetComponent<TileData>();
+            if (td != this && td.Owner == 0 && td.blank == false)
+            {
+                emptyTiles++;
+            }
+        }
+        return emptyTiles;
+    }
+
+    public void setOwnership(byte playerID)
+    {
+        playerOwner = playerID;
+        stack_size = 16;
     }
 }
