@@ -23,6 +23,9 @@ public class TileData : MonoBehaviour {
     [SerializeField]
     int tile_value;
 
+    [SerializeField]
+    List<GameObject> accessible_tiles;
+
     private GameObject checker;
 
     private GameObject stack_text;
@@ -158,9 +161,66 @@ public class TileData : MonoBehaviour {
         return emptyTiles;
     }
 
-    public void setOwnership(byte playerID)
+    public void UpdateAccessibleTiles()
+    {
+        accessible_tiles.Clear();
+
+        //Index equal to Direction.Directions
+        bool[] movable_direction = new bool[6];
+        Collider[] collision;
+
+        for (int i = 0; i < movable_direction.Length; i++)
+        {
+            collision = Physics.OverlapSphere(this.transform.position + Directions.directions[i], 0.5f);
+
+            if (collision.Length == 1)
+            {
+                Debug.Log(collision[0].GetComponent<TileData>().ID);
+                if (collision[0].gameObject.tag == "Tile")
+                {
+                    movable_direction[i] = true;
+                }
+                else
+                {
+                    movable_direction[i] = false;
+                }
+            }
+            collision = null;
+        }
+
+        for (int i = 0; i < movable_direction.Length; i++)
+        {
+            if(movable_direction[i] == true)
+            {
+                /* MAYBE DO RAYCASTING??
+                 1. reset location of tile checker
+                 2. move it by direction[i], noting the ID of each tile it touches.
+                 3. when it is moved but doesnt touch a tile, its surpassed furthest point
+                 4. add the last tile it touched by its id to the list of accessible tiles.
+                 5. voila, that is a direction it can move in and the tile it can move to.
+                 */
+            }
+        }
+        //Do a Physics.checkSphere at each of the immediate locations to check which directions you can move.
+        //Ray cast in every direction? or use the tile checker
+    }
+
+    public void SetOwnership(byte playerID)
     {
         playerOwner = playerID;
         stack_size = 16;
+    }
+
+    void OnDrawGizmos()
+    {
+        if(Owner > 0 && accessible_tiles.Count > 0)
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                Gizmos.DrawSphere(this.transform.position + Directions.directions[i], 0.5f);
+            }
+                
+        }
+       
     }
 }

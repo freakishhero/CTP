@@ -27,17 +27,26 @@ public class Game : MonoBehaviour {
     {
         board = new List<GameObject>();
         CreateGameBoard();
+        Directions.directions = new List<Vector3>();
+
+        Directions.directions.Add(new Vector3(1, 1.75f, 0)); //NE
+        Directions.directions.Add(new Vector3(2, 0, 0)); //E
+        Directions.directions.Add(new Vector3(1, -1.75f, 0)); //SE
+        Directions.directions.Add(new Vector3(-1, -1.75f, 0)); //SW
+        Directions.directions.Add(new Vector3(-2, 0f, 0)); //W
+        Directions.directions.Add(new Vector3(-1, 1.75f, 0)); //NW
+
         GameData.PlayerCount = 4;
 
         AIs = new List<GameObject>();
         for(byte i = 2; i <= GameData.PlayerCount; i++)
         {
             GameObject CPU = (GameObject)Instantiate(AIObject, Vector3.zero, Quaternion.identity);
-            CPU.GetComponent<AI>().setPlayerID(i);
-            board[i * 10].GetComponent<TileData>().setOwnership(i);
+            CPU.GetComponent<AI>().SetPlayerID(i);
+            board[i * 10].GetComponent<TileData>().SetOwnership(i);
             AIs.Add(CPU);
         }
-        board[0].GetComponent<TileData>().setOwnership(1);
+        board[0].GetComponent<TileData>().SetOwnership(1);
 
         /* board[0].GetComponent<TileData>().setOwnership(1);
          board[5].GetComponent<TileData>().setOwnership(2);
@@ -100,7 +109,7 @@ public class Game : MonoBehaviour {
     void StartGame()
     {
         UpdateTileValues();
-        GameData.EndTurn();
+        GameData.NextTurn();
     }
 
     public static void UpdateTileValues()

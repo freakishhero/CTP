@@ -49,12 +49,12 @@ public class GameData : MonoBehaviour {
         }
     }
 
-    public static void EndTurn()
+    public static void NextTurn()
     {
         if (PlayersTurn < 4)
         {
             if (PlayersTurn > 0 && PlayersTurn < 4)
-                Game.GetCPUs()[GameData.PlayersTurn - 1].GetComponent<AI>().setTurnState(false);
+                Game.GetCPUs()[PlayersTurn - 1].GetComponent<AI>().SetTurnState(false);
 
             PlayersTurn++;
         }
@@ -63,7 +63,7 @@ public class GameData : MonoBehaviour {
             PlayersTurn = 1;
         }
         turns++;
-        Debug.Log("Turn " + GameData.Turns + ": player " + GameData.PlayersTurn + "'s turn!");
+        Debug.Log("Turn " + Turns + ": player " + PlayersTurn + "'s turn!");
         Game.UpdateTileValues();
         
     }

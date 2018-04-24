@@ -6,7 +6,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{19A62416-CB6E-092D-B19F-8E2E4B9E6389}</ProjectGuid>
+    <ProjectGuid>{55C0E3FC-1310-91F8-CBE7-AF7D22EC2A79}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>Assembly-CSharp</AssemblyName>
@@ -50,6 +50,7 @@
      <Compile Include="Assets\GameData.cs" />
      <Compile Include="Assets\Objects\Board\GameBoard.cs" />
      <Compile Include="Assets\Objects\CPU\AI.cs" />
+     <Compile Include="Assets\Objects\Directions.cs" />
      <Compile Include="Assets\Objects\Player\CameraController.cs" />
      <Compile Include="Assets\Objects\Player\PlayerController.cs" />
      <Compile Include="Assets\Objects\Tile\TileData.cs" />

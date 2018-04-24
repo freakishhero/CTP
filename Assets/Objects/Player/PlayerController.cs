@@ -4,22 +4,30 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    [SerializeField]
+    int score;
 
+    [SerializeField]
+    List<GameObject> owned_tiles;
+    
     // Use this for initialization
     void Start()
     {
+        owned_tiles = new List<GameObject>();
+        score = 0;
     }
 
     void Update()
     {
         if (Input.GetKeyDown("space"))
         {
-            GameData.EndTurn();
+            CalculateScore();
+            EndTurn();
         }
 
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
-            Debug.Log("It is currently player " + GameData.PlayersTurn + "'s turn.");
+            Debug.Log("updating tiles");
         }
 
         if (Input.GetButtonDown("Fire1"))
@@ -85,7 +93,7 @@ public class PlayerController : MonoBehaviour
                                 data.StackSize /= 2;
                                 Game.GetBoard()[lastIDqueried].GetComponent<TileData>().Owner = 1;
                                 Game.GetBoard()[lastIDqueried].GetComponent<TileData>().StackSize = data.StackSize;
-                                GameData.EndTurn();
+                                EndTurn();
                             }
                             else
                             {
@@ -105,4 +113,36 @@ public class PlayerController : MonoBehaviour
         return false;
     }
 
+    void CalculateScore()
+    {
+        score = GetOwnedTiles().Count;
+    }
+
+    void EndTurn()
+    {
+        CalculateScore();
+        UpdateTiles();
+        GameData.NextTurn();
+    }
+    
+    void UpdateTiles()
+    {
+        foreach (GameObject tile in owned_tiles)
+        {
+            tile.GetComponent<TileData>().UpdateAccessibleTiles();
+        }
+    }
+
+    List<GameObject> GetOwnedTiles()
+    {
+        owned_tiles.Clear();
+        foreach (GameObject tile in Game.GetBoard())
+        {
+            if (tile.gameObject.tag == "Sheep1")
+            {
+                owned_tiles.Add(tile);
+            }
+        }
+        return owned_tiles;
+    }
 }

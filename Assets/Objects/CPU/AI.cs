@@ -14,100 +14,101 @@ public class AI : MonoBehaviour {
     int score;
 
     [SerializeField]
-    List<GameObject> ownedTiles;
+    List<GameObject> owned_tiles;
 
     [SerializeField]
-    List<int> tileWeightings;
+    List<int> tile_weightings;
 
     // Use this for initialization
     void Start () {
-        ownedTiles = new List<GameObject>();
-        tileWeightings = new List<int>();
+        score = 0;
+        owned_tiles = new List<GameObject>();
+        tile_weightings = new List<int>();
     }
 	
 	// Update is called once per frame
 	void Update () {
         if (GameData.PlayersTurn == playerID && takenTurn == false)
         {
-            takeTurn();
+            TakeTurn();
         }
         else
         {
         }
 	}
 
-    public void setPlayerID(byte ID)
+    public void SetPlayerID(byte ID)
     {
         playerID = ID;
     }
 
-    public void setTurnState(bool state)
+    public void SetTurnState(bool state)
     {
         takenTurn = state;
     }
 
-    public byte getPlayerID()
+    public byte GetPlayerID()
     {
         return playerID;
     }
 
-    void takeTurn()
+    void TakeTurn()
     {
         StartTurn();
         if(OccupyTile())
         {
         }
-        GameData.EndTurn();
+        EndTurn();
     }
 
-    List<GameObject> getOwnedTiles()
+    List<GameObject> GetOwnedTiles()
     {
-        ownedTiles.Clear();
+        owned_tiles.Clear();
         foreach (GameObject tile in Game.GetBoard())
         {
             if (tile.gameObject.tag == "Sheep" + playerID)
             {
-                ownedTiles.Add(tile);
+                owned_tiles.Add(tile);
             }
         }
-        return ownedTiles;
+        return owned_tiles;
     } 
 
-    void calculateScore()
+    void CalculateScore()
     {
-        score = getOwnedTiles().Count;
+        score = GetOwnedTiles().Count;
     }
 
     GameObject SelectTile()
     {
         GameObject chosenTile = null;
-        tileWeightings.Clear();
-        int tileWeighting = 0;
+        tile_weightings.Clear();
+        int weighting = 0;
 
-        foreach (GameObject tile in getOwnedTiles())
+        foreach (GameObject tile in GetOwnedTiles())
         {
             if (tile.GetComponent<TileData>().StackSize > 1)
             {
-                tileWeighting += tile.GetComponent<TileData>().StackSize;
+                weighting += tile.GetComponent<TileData>().StackSize;
 
                 if (tile.GetComponent<TileData>().GetSurroundingEmptyTiles() >= 1)
                 {
-                    tileWeighting += tile.GetComponent<TileData>().GetSurroundingEmptyTiles();
+                    weighting += tile.GetComponent<TileData>().GetSurroundingEmptyTiles();
                 }
             }
 
-            tileWeightings.Add(tileWeighting);
-            tileWeighting = 0;
+            tile_weightings.Add(weighting);
+            weighting = 0;
         }
 
-        for (int i = 0; i < tileWeightings.Count; i++)
+        for (int i = 0; i < tile_weightings.Count; i++)
         {
             
-            if(tileWeightings[i] > tileWeighting)
+            if(tile_weightings[i] > weighting)
             {
-                tileWeighting = tileWeightings[i];
-                if(ownedTiles[i].GetComponent<TileData>().StackSize > 1)
-                chosenTile = ownedTiles[i];
+                weighting = tile_weightings[i];
+                if(owned_tiles[i].GetComponent<TileData>().StackSize > 1)
+                chosenTile = owned_tiles[i];
             }
         }
 
@@ -166,7 +167,21 @@ public class AI : MonoBehaviour {
 
     void StartTurn()
     {
-        calculateScore();
         takenTurn = true;
+    }
+
+    void EndTurn()
+    {
+        CalculateScore();
+        UpdateTiles();
+        GameData.NextTurn();
+    }
+
+    void UpdateTiles()
+    {
+        foreach (GameObject tile in owned_tiles)
+        {
+            tile.GetComponent<TileData>().UpdateAccessibleTiles();
+        }
     }
 }
