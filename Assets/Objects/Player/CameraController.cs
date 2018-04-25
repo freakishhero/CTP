@@ -6,7 +6,7 @@ public class CameraController : MonoBehaviour
 {
 
     //The movement speed of the camera when controlled
-    float movement_speed = 20.0f;
+    float movement_speed = 5.0f;
 
     //The boundary around the screen that the mouse will move the camera within
     float camera_border_threshold = 15.0f;

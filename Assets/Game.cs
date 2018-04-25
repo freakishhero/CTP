@@ -36,7 +36,7 @@ public class Game : MonoBehaviour {
         Directions.directions.Add(new Vector3(-2, 0f, 0)); //W
         Directions.directions.Add(new Vector3(-1, 1.75f, 0)); //NW
 
-        GameData.PlayerCount = 4;
+        GameData.init();
 
         AIs = new List<GameObject>();
         for(byte i = 2; i <= GameData.PlayerCount; i++)
@@ -47,35 +47,13 @@ public class Game : MonoBehaviour {
             AIs.Add(CPU);
         }
         board[0].GetComponent<TileData>().SetOwnership(1);
-
-        /* board[0].GetComponent<TileData>().setOwnership(1);
-         board[5].GetComponent<TileData>().setOwnership(2);
-         board[60].GetComponent<TileData>().setOwnership(3);
-         board[64].GetComponent<TileData>().setOwnership(4);
-         board[146].GetComponent<TileData>().RemoveTile = true;
-         board[109].GetComponent<TileData>().RemoveTile = true;
-         board[36].GetComponent<TileData>().RemoveTile = true;
-         board[37].GetComponent<TileData>().RemoveTile = true;
-         board[34].GetComponent<TileData>().RemoveTile = true;
-         board[108].GetComponent<TileData>().RemoveTile = true;
-         board[123].GetComponent<TileData>().RemoveTile = true;
-         board[161].GetComponent<TileData>().RemoveTile = true;*/
-
-
-        //board[0].GetComponent<TileData>().setOwnership(1);
-       board[31].GetComponent<TileData>().RemoveTile = true;
-        board[37].GetComponent<TileData>().RemoveTile = true;
-        board[17].GetComponent<TileData>().RemoveTile = true;
-        board[18].GetComponent<TileData>().RemoveTile = true;
-
         StartGame();
     }
 
     // Update is called once per frame
     void Update()
     {
-        //PROCESSAI
-        //PROECSSPLAYER
+        GameData.CheckWinner();
     }
 
     void CreateGameBoard() //More like Game Bored AMIRITE?!?!?
@@ -117,7 +95,7 @@ public class Game : MonoBehaviour {
         foreach(GameObject tile in board)
         {
             TileData d = tile.GetComponent<TileData>();
-            d.TileValue = d.GetSurroundingEmptyTiles();
+            d.TileValue = d.GetValue();
         }
     }
 
