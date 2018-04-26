@@ -11,16 +11,14 @@ public class CameraController : MonoBehaviour
     //The boundary around the screen that the mouse will move the camera within
     float camera_border_threshold = 15.0f;
 
-    //The speed for mousewheel scrolling
-    float mouse_scroll_speed = 200.0f;
-
     //The x and z (perceived y) limits to clamp camera movement at
     Vector2 camera_limit;
 
     // Use this for initialization
     void Start()
     {
-        camera_limit = new Vector2(10, 15);
+        //the camera movement limits on the x and y axis
+        camera_limit = new Vector2(10, 10);
     }
 
     // Update is called once per frame
@@ -29,6 +27,7 @@ public class CameraController : MonoBehaviour
         //The cameras current position
         Vector3 position = transform.position;
 
+        //camera wasd and arrow key controls
         if (Input.GetKey("w") || Input.GetKey("up")
         || Input.mousePosition.y >= Screen.height - camera_border_threshold)
         {
@@ -53,13 +52,11 @@ public class CameraController : MonoBehaviour
             position.x += movement_speed * Time.deltaTime;
         }
 
-        float mouse_scroll_wheel = Input.GetAxis("Mouse ScrollWheel");
-        position.z += mouse_scroll_wheel * mouse_scroll_speed * Time.deltaTime;
+        //clamp the camera axis depending on its movement limits
+        position.x = Mathf.Clamp(position.x, 0, camera_limit.x);
+        position.y = Mathf.Clamp(position.y, 0, camera_limit.y);
 
-        position.x = Mathf.Clamp(position.x, 0, camera_limit.x * 2);
-        position.y = Mathf.Clamp(position.y, 0, camera_limit.y * 1.5f);
-        position.z = Mathf.Clamp(position.z, -20, -5);
-
+        //move camera to its new transform position as dictated by movement and clamping
         transform.position = position;
     }
 }

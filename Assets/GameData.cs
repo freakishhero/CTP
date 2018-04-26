@@ -10,10 +10,14 @@ public class GameData : MonoBehaviour {
     static bool game_over;
     static int[] scores;
     static bool[] can_move;
+    static bool speed_increase;
+    public static List<int> winners = new List<int>();
 
     //Use this for initialization
     public static void init()
     {
+        //initialise variables
+        speed_increase = false;
         playerCount = 4;
         PlayersTurn = 0;
         turns = 0;
@@ -30,8 +34,6 @@ public class GameData : MonoBehaviour {
         {
             can_move[i] = true;
         }
-
-
     }
 
     public static int[] GetScores()
@@ -46,11 +48,12 @@ public class GameData : MonoBehaviour {
 
     public static void CheckWinner()
     {
+        //Check that no players can make valid moves
         if (!can_move[0] && !can_move[1] && !can_move[2] && !can_move[3])
         {
             int high_score = 0;
-            List<int> winners = new List<int>();
 
+            //Check what the highest score achieves is
             for (int i = 0; i < playerCount; i++)
             {
                 if (scores[i] > high_score)
@@ -59,6 +62,7 @@ public class GameData : MonoBehaviour {
                 }
             }
 
+            //Any player(s) that got this score are winners
             for (int i = 0; i < playerCount; i++)
             {
                 if (scores[i] == high_score)
@@ -67,6 +71,7 @@ public class GameData : MonoBehaviour {
                 }
             }
 
+            //Declare the victor and end the game
             if (!GameOver)
             {
                 GameData.GameOver = true;
@@ -84,12 +89,15 @@ public class GameData : MonoBehaviour {
                 }
             }
         }
-        if(!can_move[0])
+
+        //If the player cant move, speed the AI movements up
+        if(!can_move[0] && !speed_increase)
         {
             foreach(GameObject ai in Game.GetCPUs())
             {
                 ai.GetComponent<AI>().Delay /= 2;
             }
+            speed_increase = true;
         }
         
     }
@@ -145,13 +153,16 @@ public class GameData : MonoBehaviour {
 
     public static void NextTurn()
     {
+        //Make sure the game is running
         if (game_over)
             return;
 
+        //Determine the next player's turn from the previous turn
         switch (playersTurn)
         {
             case 0:
                 playersTurn = 1;
+                turns++;
                 break;
             case 1:
                 playersTurn = 2;
@@ -164,9 +175,10 @@ public class GameData : MonoBehaviour {
                 break;
             case 4:
                 playersTurn = 1;
+                //A full turn is complete after the last player moves
+                turns++;
                 break;
         }
-        turns++;
         Debug.Log("Turn " + Turns + ": player " + PlayersTurn + "'s turn!");
         Game.UpdateTileValues();
     }

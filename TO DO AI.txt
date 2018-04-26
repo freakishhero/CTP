@@ -1,5 +1,6 @@
-
-Loop
-	check which valid tile is the best to occupy
-	check if it can move to that tile from any point
-	if it can't, remove that tile from the possible tiles and try again.
+AI report talking points:
+- How my AI searches and determines positive outcomes and how that can be applied to general searching
+	- Inspired by A* path searching
+	- Searching can be applied generally but rules are specific
+		- expand how this can be applied to other games? Board games and otherwise? (Civ, monopoly, chess)
+	
